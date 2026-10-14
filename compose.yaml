@@ -1,0 +1,22 @@
+services:
+  tsmod:
+    build: .
+    image: tsmod
+    restart: unless-stopped
+    ports:
+      - "27015:27015/udp"
+      - "27015:27015/tcp"
+      - "27080:27080/tcp"
+    environment:
+      SERVER_NAME: "The Specialists (Rust port)"
+      MAP: ts_dojo
+      MAXPLAYERS: 16
+      BOTS: 0
+      RCON_PASSWORD: ""
+      # The address players reach this host on (looked up when empty); maps download from
+      # http://PUBLIC_HOST:27080/.
+      PUBLIC_HOST: ""
+      # Or download from another site that serves this server's ts/ folder there:
+      # FASTDL_URL: https://tsmod.org/content/
+    volumes:
+      - ./custom:/custom:ro
