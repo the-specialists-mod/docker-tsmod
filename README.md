@@ -111,3 +111,17 @@ custom/
 The HTTP server only serves the files clients download (`maps/`, `models/`, `sound/`,
 `sprites/`, `gfx/`, `overviews/`, `resource/` and `events/`, by extension, and `.wad` files at the top level).
 Config files, libraries and logs answer 404.
+
+### Baking content into the image
+
+To ship a map pack inside the image instead of mounting it, build with a `content` build
+context; its files go over `ts/` at build time:
+
+```sh
+docker buildx build --build-context content=../mappack -t tsmod .
+```
+
+If the folder has a `case-aliases.txt` (lines of `referenced path<TAB>actual path`), the build
+symlinks each referenced spelling to the real file. Maps made on Windows often refer to
+`models/LightenWoods/flag.mdl` when the file is `models/lightenwoods/flag.mdl`, which a Linux
+server and the HTTP server can't find otherwise.

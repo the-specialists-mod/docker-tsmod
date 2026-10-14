@@ -26,6 +26,9 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
  && chmod +x /hlds/hlds_linux /hlds/hltv \
  && rm -rf /tmp/rehlds /tmp/rehlds.zip /hlds/steamapps
 
+# --- Optional extra content (see the ts stage) ----------------------------------------------
+FROM scratch AS content
+
 # --- TS 3.0 content and the Rust port, installed by the launcher's command line -------------
 FROM debian:${DEBIAN} AS ts
 ARG LAUNCHER_VERSION=v0.7.0
@@ -45,6 +48,19 @@ RUN if [ "$PORT_VERSION" = latest ]; then set -- --port; else set -- --port --po
       ts-launcher install --root /hlds --half-life "$@" \
  && rm -rf /tmp/tsinstaller /tmp/cache \
  && [ -f /hlds/ts/dlls/ts_i386.so ]
+# Extra content baked in over ts/: empty unless built with --build-context content=<dir>, e.g. a
+# map pack. A case-aliases.txt in it ("referenced path<TAB>actual path" lines) gets symlinks, since
+# maps made on Windows often spell a file differently from its name and Linux is case-sensitive.
+COPY --from=content / /hlds/ts/
+RUN cd /hlds/ts \
+ && if [ -f case-aliases.txt ]; then \
+      tab=$(printf '\t'); \
+      while IFS="$tab" read -r ref actual; do \
+        [ -e "$ref" ] || [ ! -e "$actual" ] && continue; \
+        mkdir -p "$(dirname "$ref")" && ln -s "/hlds/ts/$actual" "$ref"; \
+      done < case-aliases.txt; \
+    fi \
+ && rm -f case-aliases.txt MISSING_RESOURCES.md
 
 # --- Runtime -------------------------------------------------------------------------------
 FROM debian:${DEBIAN}
