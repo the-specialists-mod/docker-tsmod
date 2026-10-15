@@ -31,7 +31,7 @@ FROM scratch AS content
 
 # --- TS 3.0 content and the Rust port, installed by the launcher's command line -------------
 FROM debian:${DEBIAN} AS ts
-ARG LAUNCHER_VERSION=v0.7.0
+ARG LAUNCHER_VERSION=v0.10.0
 # A Rust port release tag (the-specialists-mod/the-specialistsmod-rs), or "latest".
 ARG PORT_VERSION=latest
 RUN apt-get update \
@@ -86,6 +86,7 @@ ENV PORT=27015 \
     RCON_PASSWORD="" \
     SV_PASSWORD="" \
     BOTS=0 \
+    GAMEPLAY="" \
     PUBLIC_HOST="" \
     PUBLIC_IP_URL=https://api.ipify.org \
     FASTDL_PORT="" \

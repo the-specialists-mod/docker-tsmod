@@ -12,6 +12,8 @@ services:
       MAP: ts_dojo
       MAXPLAYERS: 16
       BOTS: 0
+      # 21 for TS 2.1's rules (Rust port clients only), 30 for 3.0's; empty leaves it to server.cfg.
+      GAMEPLAY: ""
       RCON_PASSWORD: ""
       # The address players reach this host on (looked up when empty); maps download from
       # http://PUBLIC_HOST:27080/.

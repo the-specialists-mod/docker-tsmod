@@ -76,6 +76,7 @@ hostname "$(q "$SERVER_NAME")"
 rcon_password "$(q "$RCON_PASSWORD")"
 sv_password "$(q "$SV_PASSWORD")"
 ts_bot_quota $BOTS
+$([ -n "$GAMEPLAY" ] && printf 'ts_gameplay "%s"\n' "$(q "$GAMEPLAY")")
 
 // Downloads: maps, models, sounds and sprites come from the container's HTTP server.
 sv_allowdownload 1

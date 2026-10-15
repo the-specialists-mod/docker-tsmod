@@ -45,6 +45,7 @@ docker run -d --name tsmod \
 | `RCON_PASSWORD` | | empty turns rcon off |
 | `SV_PASSWORD` | | join password |
 | `BOTS` | `0` | the port's `ts_bot_quota` |
+| `GAMEPLAY` | | the port's `ts_gameplay`: `21` plays by TS 2.1's rules, `30` by 3.0's; empty leaves it to `server.cfg` (3.0 unless it says otherwise). The engine runs the server config after the first map has loaded, so in 2.1 mode that map loads once more under 2.1 before anyone joins. TS 3.0's original client can't join a 2.1 server, only the Rust port's |
 | `EXTRA_ARGS` | | more `hlds_linux` arguments, e.g. `-pingboost 2 +sys_ticrate 1000` |
 
 If `PORT` or `HTTP_PORT` change, publish the matching ports.
@@ -93,7 +94,7 @@ sv_allow_dlfile 0
 ```
 
 Build arguments: `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
-(`v0.7.0`), `REHLDS_VERSION` (`3.15.0.896`).
+(`v0.10.0`), `REHLDS_VERSION` (`3.15.0.896`).
 
 ## Custom content
 
