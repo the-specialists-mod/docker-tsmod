@@ -94,7 +94,7 @@ sv_allow_dlfile 0
 ```
 
 Build arguments: `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
-(`v0.10.0`), `REHLDS_VERSION` (`3.15.0.896`).
+(`v0.11.0`), `REHLDS_VERSION` (`3.15.0.896`).
 
 ## Custom content
 
