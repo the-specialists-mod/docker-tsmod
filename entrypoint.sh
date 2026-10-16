@@ -10,6 +10,24 @@ if [ -d /custom ] && [ -n "$(ls -A /custom 2>/dev/null)" ]; then
     cp -a /custom/. "$TS"/
 fi
 
+# AMX Mod X: the engine loads metamod (which loads AMXX and the game library) or the game library.
+if [ "$AMXX" = 1 ]; then gamedll=addons/metamod/metamod_i386.so; else gamedll=dlls/ts_i386.so; fi
+sed -i "s|^gamedll_linux .*|gamedll_linux \"$gamedll\"|" "$TS/liblist.gam"
+echo "entrypoint: AMX Mod X $([ "$AMXX" = 1 ] && echo on || echo off)"
+
+# Bans (amx_ban, amx_banip, banid/addip + writeid/writeip) go to banned.cfg and listip.cfg; with a
+# volume on /data they live there and survive the container.
+for f in banned.cfg listip.cfg; do
+    if [ -d /data ] && [ -w /data ]; then
+        [ -f "/data/$f" ] || { [ -f "$TS/$f" ] && [ ! -L "$TS/$f" ] && cp "$TS/$f" "/data/$f" || : > "/data/$f"; }
+        ln -sf "/data/$f" "$TS/$f"
+    else
+        [ -e "$TS/$f" ] || : > "$TS/$f"
+    fi
+done
+[ -d /data ] && [ -w /data ] && echo "entrypoint: bans in /data" \
+    || echo "entrypoint: no writable /data volume: bans are lost with the container"
+
 sed "s/@HTTP_PORT@/$HTTP_PORT/" /etc/nginx/tsmod.conf > /tmp/nginx.conf
 nginx -c /tmp/nginx.conf
 for _ in 1 2 3 4 5 6 7 8 9 10; do
@@ -71,12 +89,15 @@ cat > "$TS/docker_server.cfg" <<EOF
 // Written by entrypoint.sh at every start from the container's environment; put your own
 // settings in server.cfg (or /custom/server.cfg), which runs first.
 exec server.cfg
+exec banned.cfg
+exec listip.cfg
 
 hostname "$(q "$SERVER_NAME")"
 rcon_password "$(q "$RCON_PASSWORD")"
 sv_password "$(q "$SV_PASSWORD")"
 ts_bot_quota $BOTS
 $([ -n "$GAMEPLAY" ] && printf 'ts_gameplay "%s"\n' "$(q "$GAMEPLAY")")
+$([ -n "$BOT_BACKEND" ] && printf 'ts_bot_backend "%s"\n' "$(q "$BOT_BACKEND")")
 
 // Downloads: maps, models, sounds and sprites come from the container's HTTP server.
 sv_allowdownload 1

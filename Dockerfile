@@ -28,6 +28,29 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
 
 # --- Optional extra content (see the ts stage) ----------------------------------------------
 FROM scratch AS content
+# --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
+# No releases yet, so it's built here (on the runtime's Debian, for its glibc). RCBOT_REF must pin
+# the same port release (plugin API version) as PORT_VERSION: bed1b0c = port v3.0.6.
+FROM debian:${DEBIAN} AS rcbot-build
+ARG RCBOT_REF=bed1b0ce5562101d3bd1f320a840c98af1f31602
+# goldsrc-sys (the port's) generates its bindings from the FWGS headers; the port's release commit.
+ARG FWGS_REF=51353ff8d65e58300eeb2bd014867673f1f367c6
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl git gcc-multilib libclang-dev \
+ && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --target i686-unknown-linux-gnu
+WORKDIR /src
+RUN git clone --filter=blob:none https://github.com/FWGS/xash3d-fwgs xash3d-fwgs \
+ && git -C xash3d-fwgs checkout -q "$FWGS_REF" \
+ && git -C xash3d-fwgs submodule update --init 3rdparty/library_suffix \
+ && git clone --filter=blob:none https://github.com/the-specialists-mod/tsmod-rcbot-rs rcbot \
+ && git -C rcbot checkout -q "$RCBOT_REF"
+RUN cd rcbot \
+ && /root/.cargo/bin/cargo build --release -p tsmod-rcbot --target i686-unknown-linux-gnu \
+ && mkdir -p /out/dlls /out/tsmod \
+ && cp target/i686-unknown-linux-gnu/release/libtsmod_rcbot.so /out/dlls/tsmod_rcbot_i386.so \
+ && strip /out/dlls/tsmod_rcbot_i386.so \
+ && cp -r data/rcbot /out/tsmod/rcbot
 
 # --- TS 3.0 content and the Rust port, installed by the launcher's command line -------------
 FROM debian:${DEBIAN} AS ts
@@ -62,6 +85,56 @@ RUN cd /hlds/ts \
     fi \
  && rm -f case-aliases.txt MISSING_RESOURCES.md
 
+# --- Metamod-R and AMX Mod X, with the Rust port's tsx/tsfun/hamsandwich modules ---------------
+# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.1.0 =
+# port v3.0.6). Metamod sits between the engine and the game library; the entrypoint's AMXX
+# setting chooses which one liblist.gam names.
+FROM debian:${DEBIAN} AS amxx
+ARG METAMOD_R_VERSION=1.3.0.149
+ARG AMXX_VERSION=1.10.0-git5487
+ARG AMXX_MODULES_VERSION=v0.1.0
+# amxxpc, the plugin compiler, is 32-bit.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl unzip lib32stdc++6 \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /out/addons
+RUN curl -fsSL -o /tmp/mm.zip \
+      "https://github.com/rehlds/Metamod-R/releases/download/${METAMOD_R_VERSION}/metamod-bin-${METAMOD_R_VERSION}.zip" \
+ && unzip -q /tmp/mm.zip 'addons/metamod/*' -d /tmp/mm \
+ && mkdir metamod && cp /tmp/mm/addons/metamod/metamod_i386.so /tmp/mm/addons/metamod/config.ini metamod/ \
+ && printf '\ngamedll dlls/ts_i386.so\n' >> metamod/config.ini \
+ && echo 'linux addons/amxmodx/dlls/amxmodx_mm_i386.so' > metamod/plugins.ini \
+ && curl -fsSL "https://www.amxmodx.org/amxxdrop/1.10/amxmodx-${AMXX_VERSION}-base-linux.tar.gz" \
+      | tar xz --no-same-owner -C /tmp \
+ && cp -a /tmp/addons/amxmodx . \
+ && curl -fsSL -o /tmp/mods.zip \
+      "https://github.com/the-specialists-mod/tsmod-amxx-rs/releases/download/${AMXX_MODULES_VERSION}/tsmod-amxx-rs-${AMXX_MODULES_VERSION}-linux-i686.zip" \
+ && unzip -qo /tmp/mods.zip 'addons/*' -d /out \
+ # The stock maps.ini lists no maps, which leaves mapchooser and the maps menu empty; without
+ # it they use the server's mapcycle.txt.
+ && rm amxmodx/configs/maps.ini \
+ && [ -f amxmodx/modules/tsx_amxx_i386.so ] && [ -f amxmodx/plugins/mapchooser.amxx ] \
+ && rm -rf /tmp/*
+# Plugins of this repo (plugins/*.sma), compiled and enabled.
+COPY plugins /tmp/plugins
+RUN sc=amxmodx/scripting \
+ && printf '\n; docker-tsmod plugins\n' >> amxmodx/configs/plugins.ini \
+ && for f in /tmp/plugins/*.sma; do \
+      n=$(basename "$f" .sma); \
+      LD_LIBRARY_PATH=$sc $sc/amxxpc "$f" -i$sc/include -oamxmodx/plugins/$n.amxx \
+        || exit 1; \
+      echo "$n.amxx" >> amxmodx/configs/plugins.ini; \
+    done \
+ && rm -rf /tmp/plugins
+
+FROM ts AS ts-amxx
+COPY --from=amxx /out/addons /hlds/ts/addons
+# Metamod-R tells plugins the game library is dlls/ts_i686.so (its known-games name for TS) even
+# when config.ini's gamedll loads ts_i386.so, and tsx looks the port's plugin API up there. That
+# name holds TS 3.0's original library, which nothing loads: make it the port's.
+RUN ln -sf ts_i386.so /hlds/ts/dlls/ts_i686.so
+COPY --from=rcbot-build /out /hlds/ts/
+
 # --- Runtime -------------------------------------------------------------------------------
 FROM debian:${DEBIAN}
 RUN dpkg --add-architecture i386 \
@@ -69,7 +142,7 @@ RUN dpkg --add-architecture i386 \
  && apt-get install -y --no-install-recommends ca-certificates curl lib32gcc-s1 lib32stdc++6 nginx-light tini \
  && rm -rf /var/lib/apt/lists/* \
  && useradd -m -u 1000 tsmod
-COPY --from=ts --chown=tsmod:tsmod /hlds /hlds
+COPY --from=ts-amxx --chown=tsmod:tsmod /hlds /hlds
 COPY nginx.conf /etc/nginx/tsmod.conf
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 USER tsmod
@@ -85,8 +158,10 @@ ENV PORT=27015 \
     SERVER_NAME="The Specialists (Rust port)" \
     RCON_PASSWORD="" \
     SV_PASSWORD="" \
-    BOTS=0 \
+    BOTS=8 \
     GAMEPLAY="" \
+    AMXX=1 \
+    BOT_BACKEND="" \
     PUBLIC_HOST="" \
     PUBLIC_IP_URL=https://api.ipify.org \
     FASTDL_PORT="" \

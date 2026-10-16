@@ -11,9 +11,11 @@ services:
       SERVER_NAME: "The Specialists (Rust port)"
       MAP: ts_dojo
       MAXPLAYERS: 16
-      BOTS: 0
+      BOTS: 8
       # 21 for TS 2.1's rules (Rust port clients only), 30 for 3.0's; empty leaves it to server.cfg.
       GAMEPLAY: ""
+      # rcbot for RCBot's bots (BOTS of them), native for TS's own; empty leaves it to server.cfg.
+      BOT_BACKEND: ""
       RCON_PASSWORD: ""
       # The address players reach this host on (looked up when empty); maps download from
       # http://PUBLIC_HOST:27080/.
@@ -22,3 +24,5 @@ services:
       # FASTDL_URL: https://tsmod.org/content/
     volumes:
       - ./custom:/custom:ro
+      # Bans (banned.cfg, listip.cfg); the folder must be writable by uid 1000.
+      - ./data:/data

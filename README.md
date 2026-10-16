@@ -7,6 +7,10 @@ A Docker image for a [The Specialists](https://tsmod.org) 3.0 dedicated server:
   [launcher](https://github.com/the-specialists-mod/tsmod-launcher)'s command line,
 - the [Rust port](https://github.com/the-specialists-mod/the-specialistsmod-rs)'s server library
   in place of the original one,
+- [Metamod-R](https://github.com/rehlds/Metamod-R) and [AMX Mod X](https://www.amxmodx.org) 1.10,
+  with the [Rust tsx, tsfun and hamsandwich modules](https://github.com/the-specialists-mod/tsmod-amxx-rs)
+  in place of the stock ones (see [AMX Mod X](#amx-mod-x)),
+- [RCBot](https://github.com/the-specialists-mod/tsmod-rcbot-rs), the port's `tsmod_rcbot` bot plugin,
 - nginx serving the game files over HTTP. The server points players at it (`sv_downloadurl`)
   and sends nothing through the game port (`sv_allow_dlfile 0`), so maps, models and sounds
   download at full speed.
@@ -24,7 +28,7 @@ docker build -t tsmod .
 docker run -d --name tsmod \
   -p 27015:27015/udp -p 27015:27015/tcp -p 27080:27080/tcp \
   -e PUBLIC_HOST=203.0.113.10 -e RCON_PASSWORD=secret -e BOTS=4 \
-  -v "$PWD/custom:/custom:ro" \
+  -v "$PWD/custom:/custom:ro" -v "$PWD/data:/data" \
   tsmod
 ```
 
@@ -44,7 +48,9 @@ docker run -d --name tsmod \
 | `DOWNLOAD_FALLBACK` | `0` | `1` lets clients fall back to downloading through the game port when HTTP fails |
 | `RCON_PASSWORD` | | empty turns rcon off |
 | `SV_PASSWORD` | | join password |
-| `BOTS` | `0` | the port's `ts_bot_quota` |
+| `BOTS` | `8` | the port's `ts_bot_quota` |
+| `BOT_BACKEND` | | the port's `ts_bot_backend`: `rcbot` for RCBot's bots, `native` for TS's own; empty leaves it to `server.cfg` (native unless it says otherwise). Like `GAMEPLAY`, the first map loads once more with it |
+| `AMXX` | `1` | `0` runs the game library without metamod and AMX Mod X |
 | `GAMEPLAY` | | the port's `ts_gameplay`: `21` plays by TS 2.1's rules, `30` by 3.0's; empty leaves it to `server.cfg` (3.0 unless it says otherwise). The engine runs the server config after the first map has loaded, so in 2.1 mode that map loads once more under 2.1 before anyone joins. TS 3.0's original client can't join a 2.1 server, only the Rust port's |
 | `EXTRA_ARGS` | | more `hlds_linux` arguments, e.g. `-pingboost 2 +sys_ticrate 1000` |
 
@@ -81,10 +87,13 @@ them), so the entrypoint writes `ts/docker_server.cfg` at each start and points 
 at it. It runs `server.cfg` first, then sets:
 
 ```
+exec banned.cfg
+exec listip.cfg
+
 hostname "..."
 rcon_password "..."
 sv_password "..."
-ts_bot_quota 0
+ts_bot_quota 8
 
 // Downloads: maps, models, sounds and sprites come from the container's HTTP server.
 sv_allowdownload 1
@@ -94,7 +103,50 @@ sv_allow_dlfile 0
 ```
 
 Build arguments: `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
-(`v0.11.0`), `REHLDS_VERSION` (`3.15.0.896`).
+(`v0.11.0`), `REHLDS_VERSION` (`3.15.0.896`), `METAMOD_R_VERSION` (`1.3.0.149`), `AMXX_VERSION`
+(`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.1.0`), `RCBOT_REF` (a tsmod-rcbot-rs commit) and
+`FWGS_REF` (the FWGS headers RCBot is built against). The AMXX modules and RCBot talk to the port
+through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` v0.1.0 and the default
+`RCBOT_REF` go with port v3.0.6, so build those with `--build-arg PORT_VERSION=v3.0.6` (with
+`latest`, a newer port can change the API, and Docker may also reuse an older cached download).
+
+## AMX Mod X
+
+AMX Mod X runs with its stock plugins (`addons/amxmodx/configs/plugins.ini`), which include map
+voting and management:
+
+- `mapchooser`: a vote for the next map near the end of each map (`mp_timelimit`), from
+  `mapcycle.txt`, with an option to extend the current one,
+- `nextmap` and `timeleft`: `nextmap` and `timeleft` in chat,
+- `mapsmenu`: `amx_mapmenu` (change map) and `amx_votemapmenu` (start a map vote) for admins,
+- `adminvote`: `amx_votemap`, `amx_vote` and friends,
+- `admincmd`: `amx_map`, `amx_kick`, `amx_ban`, ...
+
+and this repo's `plugins/` (compiled at build time and enabled):
+
+- `tsmsg` (TSMessages Plus by Shurik3n): colours TS's kill announcements ("is a killer",
+  "Kung-Fu style!", ...) by kind and kill streak. Cvars `amx_tsmsgs 1` (on) and
+  `amx_randommsgs 0` (random colours).
+
+The stock `maps.ini` is removed, so these use `mapcycle.txt`. Admin commands work from the server
+console and rcon (`rcon amx_map ts_dojo`); in-game admins go in `users.ini`, e.g. a
+`custom/addons/amxmodx/configs/users.ini` with
+
+```
+"STEAM_0:1:12345" "" "abcdefghijklmnopqrstu" "ce"
+```
+
+`/custom` can also add plugins (`addons/amxmodx/plugins/*.amxx` and a `plugins.ini`) and enable
+modules (`configs/modules.ini`). tsx, tsfun and hamsandwich are the Rust ports, which reach the
+server through the port's plugin API instead of TS 2.x's memory offsets.
+
+
+### Bans
+
+`amx_ban`, `amx_banip` and `amx_addban` (and the engine's `banid`/`addip` with `writeid`/`writeip`)
+write `banned.cfg` and `listip.cfg`, which the server config runs at every map. With a writable
+volume on `/data` (writable for uid 1000) the entrypoint keeps both files there, so bans survive
+the container; without one they're lost with it.
 
 ## Custom content
 
