@@ -29,10 +29,10 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
 # --- Optional extra content (see the ts stage) ----------------------------------------------
 FROM scratch AS content
 # --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
-# No releases yet, so it's built here (on the runtime's Debian, for its glibc). RCBOT_REF must pin
-# the same port release (plugin API version) as PORT_VERSION: bed1b0c = port v3.0.6.
+# Built here (on the runtime's Debian): the release libraries need a newer glibc than bookworm's.
+# RCBOT_REF must pin the same port release (plugin API version) as PORT_VERSION: v0.1.0 = port v3.0.6.
 FROM debian:${DEBIAN} AS rcbot-build
-ARG RCBOT_REF=bed1b0ce5562101d3bd1f320a840c98af1f31602
+ARG RCBOT_REF=v0.1.0
 # goldsrc-sys (the port's) generates its bindings from the FWGS headers; the port's release commit.
 ARG FWGS_REF=51353ff8d65e58300eeb2bd014867673f1f367c6
 RUN apt-get update \
