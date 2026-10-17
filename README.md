@@ -103,11 +103,10 @@ sv_allow_dlfile 0
 ```
 
 Build arguments: `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
-(`v0.11.0`), `REHLDS_VERSION` (`3.15.0.896`), `METAMOD_R_VERSION` (`1.3.0.149`), `AMXX_VERSION`
-(`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.1.0`), `RCBOT_REF` (a tsmod-rcbot-rs tag or commit, `v0.1.0`) and
-`FWGS_REF` (the FWGS headers RCBot is built against). The AMXX modules and RCBot talk to the port
-through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` and `RCBOT_REF` v0.1.0
-go with port v3.0.6, so build those with `--build-arg PORT_VERSION=v3.0.6` (with
+(`v0.12.0`), `REHLDS_VERSION` (`3.15.0.896`), `METAMOD_R_VERSION` (`1.3.0.149`), `AMXX_VERSION`
+(`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.2.0`) and `RCBOT_VERSION` (a tsmod-rcbot-rs release, `v0.2.0`). The AMXX modules and RCBot talk to the port
+through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` and `RCBOT_VERSION` v0.2.0
+go with port v3.0.7, so build those with `--build-arg PORT_VERSION=v3.0.7` (with
 `latest`, a newer port can change the API, and Docker may also reuse an older cached download).
 
 ## AMX Mod X

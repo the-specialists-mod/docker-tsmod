@@ -29,32 +29,21 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
 # --- Optional extra content (see the ts stage) ----------------------------------------------
 FROM scratch AS content
 # --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
-# Built here (on the runtime's Debian): the release libraries need a newer glibc than bookworm's.
-# RCBOT_REF must pin the same port release (plugin API version) as PORT_VERSION: v0.1.0 = port v3.0.6.
-FROM debian:${DEBIAN} AS rcbot-build
-ARG RCBOT_REF=v0.1.0
-# goldsrc-sys (the port's) generates its bindings from the FWGS headers; the port's release commit.
-ARG FWGS_REF=51353ff8d65e58300eeb2bd014867673f1f367c6
+# The release built for bookworm's glibc (2.36). RCBOT_VERSION must pin the same port release
+# (plugin API version) as PORT_VERSION: v0.2.0 = port v3.0.7.
+FROM debian:${DEBIAN} AS rcbot
+ARG RCBOT_VERSION=v0.2.0
 RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl git gcc-multilib libclang-dev \
+ && apt-get install -y --no-install-recommends ca-certificates curl \
  && rm -rf /var/lib/apt/lists/*
-RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --target i686-unknown-linux-gnu
-WORKDIR /src
-RUN git clone --filter=blob:none https://github.com/FWGS/xash3d-fwgs xash3d-fwgs \
- && git -C xash3d-fwgs checkout -q "$FWGS_REF" \
- && git -C xash3d-fwgs submodule update --init 3rdparty/library_suffix \
- && git clone --filter=blob:none https://github.com/the-specialists-mod/tsmod-rcbot-rs rcbot \
- && git -C rcbot checkout -q "$RCBOT_REF"
-RUN cd rcbot \
- && /root/.cargo/bin/cargo build --release -p tsmod-rcbot --target i686-unknown-linux-gnu \
- && mkdir -p /out/dlls /out/tsmod \
- && cp target/i686-unknown-linux-gnu/release/libtsmod_rcbot.so /out/dlls/tsmod_rcbot_i386.so \
- && strip /out/dlls/tsmod_rcbot_i386.so \
- && cp -r data/rcbot /out/tsmod/rcbot
+RUN mkdir /out \
+ && curl -fsSL "https://github.com/the-specialists-mod/tsmod-rcbot-rs/releases/download/${RCBOT_VERSION}/tsmod-rcbot-rs-${RCBOT_VERSION}-linux-i686-glibc2.36.tar.gz" \
+      | tar xz --no-same-owner -C /out ./ts \
+ && [ -f /out/ts/dlls/tsmod_rcbot_i386.so ] && [ -d /out/ts/tsmod/rcbot ]
 
 # --- TS 3.0 content and the Rust port, installed by the launcher's command line -------------
 FROM debian:${DEBIAN} AS ts
-ARG LAUNCHER_VERSION=v0.11.0
+ARG LAUNCHER_VERSION=v0.12.0
 # A Rust port release tag (the-specialists-mod/the-specialistsmod-rs), or "latest".
 ARG PORT_VERSION=latest
 RUN apt-get update \
@@ -86,13 +75,13 @@ RUN cd /hlds/ts \
  && rm -f case-aliases.txt MISSING_RESOURCES.md
 
 # --- Metamod-R and AMX Mod X, with the Rust port's tsx/tsfun/hamsandwich modules ---------------
-# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.1.0 =
-# port v3.0.6). Metamod sits between the engine and the game library; the entrypoint's AMXX
+# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.2.0 =
+# port v3.0.7). Metamod sits between the engine and the game library; the entrypoint's AMXX
 # setting chooses which one liblist.gam names.
 FROM debian:${DEBIAN} AS amxx
 ARG METAMOD_R_VERSION=1.3.0.149
 ARG AMXX_VERSION=1.10.0-git5487
-ARG AMXX_MODULES_VERSION=v0.1.0
+ARG AMXX_MODULES_VERSION=v0.2.0
 # amxxpc, the plugin compiler, is 32-bit.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip lib32stdc++6 \
@@ -133,7 +122,7 @@ COPY --from=amxx /out/addons /hlds/ts/addons
 # when config.ini's gamedll loads ts_i386.so, and tsx looks the port's plugin API up there. That
 # name holds TS 3.0's original library, which nothing loads: make it the port's.
 RUN ln -sf ts_i386.so /hlds/ts/dlls/ts_i686.so
-COPY --from=rcbot-build /out /hlds/ts/
+COPY --from=rcbot /out/ts /hlds/ts/
 
 # --- Runtime -------------------------------------------------------------------------------
 FROM debian:${DEBIAN}
