@@ -28,7 +28,7 @@ docker build -t tsmod .
 docker run -d --name tsmod \
   -p 27015:27015/udp -p 27015:27015/tcp -p 27080:27080/tcp \
   -e PUBLIC_HOST=203.0.113.10 -e RCON_PASSWORD=secret -e BOTS=4 \
-  -v "$PWD/custom:/custom:ro" -v "$PWD/data:/data" \
+  -v "$PWD/custom:/custom:ro" -v tsmod-data:/data \
   tsmod
 ```
 
@@ -143,9 +143,22 @@ server through the port's plugin API instead of TS 2.x's memory offsets.
 ### Bans
 
 `amx_ban`, `amx_banip` and `amx_addban` (and the engine's `banid`/`addip` with `writeid`/`writeip`)
-write `banned.cfg` and `listip.cfg`, which the server config runs at every map. With a writable
-volume on `/data` (writable for uid 1000) the entrypoint keeps both files there, so bans survive
-the container; without one they're lost with it.
+write `banned.cfg` and `listip.cfg`, which the server config runs at every map. The entrypoint
+keeps both files in `/data` (see [Stored data](#stored-data)).
+
+## Stored data
+
+`/data` is a volume for what the server writes, so it survives the container:
+
+- `banned.cfg` and `listip.cfg`: the bans.
+- `rcbot/`: RCBot's data folder (`ts/tsmod/rcbot` links to it): what its bots learn (the
+  `botprofiles/` files, such as the kung fu combos in `.rkf`, and the weapon and team stats) and
+  the waypoints. At each start the image's own RCBot files are copied in where they're newer than
+  the volume's, so a new release's waypoints arrive without losing what the bots learned.
+
+Docker gives `/data` an anonymous volume unless you mount one; name it (`-v tsmod-data:/data`, as
+`compose.yaml` does) to keep it across containers. A bind mount must be writable by uid 1000.
+Without a writable `/data` all of this is lost with the container.
 
 ## Custom content
 

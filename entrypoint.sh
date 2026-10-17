@@ -25,8 +25,21 @@ for f in banned.cfg listip.cfg; do
         [ -e "$TS/$f" ] || : > "$TS/$f"
     fi
 done
-[ -d /data ] && [ -w /data ] && echo "entrypoint: bans in /data" \
-    || echo "entrypoint: no writable /data volume: bans are lost with the container"
+
+# RCBot's data folder (what its bots learn: profiles, kung fu combos, weapon stats; and waypoints)
+# lives in /data/rcbot. The image's files (rcbot.image) are copied in where they're newer, so a
+# new release's waypoints arrive and the bots' learning stays.
+rc=$TS/tsmod/rcbot
+if [ -d /data ] && [ -w /data ]; then
+    [ -L "$rc" ] || mv "$rc" "$rc.image"
+    mkdir -p /data/rcbot
+    cp -a -u "$rc.image"/. /data/rcbot/
+    ln -sfn /data/rcbot "$rc"
+    echo "entrypoint: bans and RCBot data in /data"
+else
+    [ -L "$rc" ] && rm "$rc" && mv "$rc.image" "$rc"
+    echo "entrypoint: no writable /data volume: bans and what RCBot learns are lost with the container"
+fi
 
 sed "s/@HTTP_PORT@/$HTTP_PORT/" /etc/nginx/tsmod.conf > /tmp/nginx.conf
 nginx -c /tmp/nginx.conf

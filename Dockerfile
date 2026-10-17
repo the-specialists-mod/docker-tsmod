@@ -130,7 +130,8 @@ RUN dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl lib32gcc-s1 lib32stdc++6 nginx-light tini \
  && rm -rf /var/lib/apt/lists/* \
- && useradd -m -u 1000 tsmod
+ && useradd -m -u 1000 tsmod \
+ && mkdir /data && chown tsmod:tsmod /data
 COPY --from=ts-amxx --chown=tsmod:tsmod /hlds /hlds
 COPY nginx.conf /etc/nginx/tsmod.conf
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -159,6 +160,7 @@ ENV PORT=27015 \
     EXTRA_ARGS=""
 
 # /custom is copied over ts/ at start: maps, models, sounds, mapcycle.txt, motd.txt, server.cfg.
-VOLUME ["/custom"]
+# /data keeps what the server writes: bans and RCBot's data (what its bots learn).
+VOLUME ["/custom", "/data"]
 EXPOSE 27015/udp 27015/tcp 27080/tcp
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/entrypoint.sh"]
