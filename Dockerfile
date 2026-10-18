@@ -58,10 +58,10 @@ FROM hlds-${ARCH} AS hlds
 FROM scratch AS content
 # --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
 # The release built for bookworm's glibc (2.36). RCBOT_VERSION must pin the same port release
-# (plugin API version) as PORT_VERSION: v0.3.0 = port v3.0.8.
+# (plugin API version) as PORT_VERSION: v0.3.0 and v0.3.1 = port v3.0.8.
 FROM debian:${DEBIAN} AS rcbot
 ARG ARCH
-ARG RCBOT_VERSION=v0.3.0
+ARG RCBOT_VERSION=v0.3.1
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl \
  && rm -rf /var/lib/apt/lists/*
@@ -172,9 +172,9 @@ ARG ARCH
 # rcbot_amxx (the-specialists-mod/tsmod-amxx-rcbot): RCBot as an AMX Mod X plugin with its
 # modules (rcbot_megahal, rcbot_learn, rcbot_nav), the alternative to tsmod_rcbot. Installed but
 # not in plugins.ini: the entrypoint enables it for BOT_BACKEND=rcbot_amxx. AMXX_RCBOT_VERSION
-# must be built for the same plugin API as AMXX_MODULES_VERSION (v0.2.0 = tsmod-amxx-rs v0.4.0).
+# must be built for the same plugin API as AMXX_MODULES_VERSION (v0.2.0 and v0.2.1 = tsmod-amxx-rs v0.4.0).
 # Its tsmod/rcbot data is the rcbot stage's.
-ARG AMXX_RCBOT_VERSION=v0.2.0
+ARG AMXX_RCBOT_VERSION=v0.2.1
 WORKDIR /out/addons
 RUN platform=$([ "$ARCH" = amd64 ] && echo linux-x86_64 || echo linux-i686) \
  && curl -fsSL -o /tmp/rcbot_amxx.zip \
