@@ -30,9 +30,9 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
 FROM scratch AS content
 # --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
 # The release built for bookworm's glibc (2.36). RCBOT_VERSION must pin the same port release
-# (plugin API version) as PORT_VERSION: v0.2.0 = port v3.0.7.
+# (plugin API version) as PORT_VERSION: v0.3.0 = port v3.0.8.
 FROM debian:${DEBIAN} AS rcbot
-ARG RCBOT_VERSION=v0.2.0
+ARG RCBOT_VERSION=v0.3.0
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl \
  && rm -rf /var/lib/apt/lists/*
@@ -75,13 +75,13 @@ RUN cd /hlds/ts \
  && rm -f case-aliases.txt MISSING_RESOURCES.md
 
 # --- Metamod-R and AMX Mod X, with the Rust port's tsx/tsfun/hamsandwich modules ---------------
-# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.2.0 =
-# port v3.0.7). Metamod sits between the engine and the game library; the entrypoint's AMXX
+# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.3.0 =
+# port v3.0.8). Metamod sits between the engine and the game library; the entrypoint's AMXX
 # setting chooses which one liblist.gam names.
 FROM debian:${DEBIAN} AS amxx
 ARG METAMOD_R_VERSION=1.3.0.149
 ARG AMXX_VERSION=1.10.0-git5487
-ARG AMXX_MODULES_VERSION=v0.2.0
+ARG AMXX_MODULES_VERSION=v0.3.0
 # amxxpc, the plugin compiler, is 32-bit.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip lib32stdc++6 \
