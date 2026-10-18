@@ -1,0 +1,101 @@
+Protocol version 48
+Exe version 1.1.2.2/Stdio (valve)
+Exe build: 13:38:01 May 18 2026 (4419)
+Server IP address 10.1.2.114:27316
+Could not get IPX address, IPX disabled
+Reason:  WSAENOTSOCK
+   
+   Metamod-r version 1.3.0.149 Copyright (c) 2016-2018 ReHLDS Team (rebuild of original Metamod by Will Day and Jussi Kivilinna)
+   Metamod-r comes with ABSOLUTELY NO WARRANTY; for details type `meta gpl'.
+   This is free software, and you are welcome to redistribute it
+   under certain conditions; type `meta gpl' for details.
+   
+Metamod-r v1.3.0.149, API (5:13)
+Metamod-r build: 11:31:15 Apr 23 2024
+Metamod-r from: https://github.com/theAsmodai/metamod-r/commit/603a257
+
+   AMX Mod X version 1.10.0.5487 Copyright (c) 2004-2015 AMX Mod X Development Team 
+   AMX Mod X comes with ABSOLUTELY NO WARRANTY; for details type `amxx gpl'.
+   This is free software and you are welcome to redistribute it under 
+   certain conditions; type 'amxx gpl' for details.
+  
+L 10/12/2026 - 22:00:42: GameConfig CRC computed engine=D9A5B505 (Z:\home\mmckenzie\games\amxx_rehlds_win\swds.dll)
+L 10/12/2026 - 22:00:42: GameConfig CRC computed server=B4F51E6E (z:\home\mmckenzie\games\amxx_rehlds_win\ts\dlls\mp.dll)
+L 10/12/2026 - 22:00:42: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected 2C9EDE6B got D9A5B505
+L 10/12/2026 - 22:00:42: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected F3A7F2F1 got D9A5B505
+L 10/12/2026 - 22:00:42: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected 2C9EDE6B got D9A5B505
+L 10/12/2026 - 22:00:42: [FAKEMETA] get/set_gamerules_* natives have been disabled because g_pGameRules address could not be found. 
+[ts] GameInit: Rust TS server library loaded
+L 10/12/2026 - 22:00:42: -------- Mapchange to ts_dojo --------
+[ts] game rules: DeathMatch (Team1;Team2;Team3;Team4)
+[ts] ServerActivate: 211 edicts, 8 max clients
+[AMXX] Loaded 1 admin from file
+L 10/12/2026 - 22:00:43: plugin_init: map=ts_dojo mod=ts maxplayers=8
+L 10/12/2026 - 22:00:43: [amxx_test.amxx] performance issue. Function plugin_init executed more than 1.5ms.
+L 10/12/2026 - 22:00:43: Log file started (file "ts\addons\amxmodx\logs\pdata_test.log") (game "ts") (amx "1.10.0.5487")
+L 10/12/2026 - 22:00:43: plugin_init
+L 10/12/2026 - 22:00:43: [pdata_test.amxx] performance issue. Function plugin_init executed more than 2.5ms.
+L 10/12/2026 - 22:00:43: plugin_cfg
+L 10/12/2026 - 22:00:43: [amxx_test.amxx] performance issue. Function plugin_cfg executed more than 1.3ms.
+Executing server.cfg 
+Weapons allowed: knives pistols SMGs rifles shotguns 
+Server logging data to file logs\L1012002.log
+L 10/12/2026 - 22:00:45: Log file started (file "logs\L1012002.log") (game "ts") (version "48/1.1.2.2/Stdio/4419")
+Executing AMX Mod X Configuration File 
+Scrolling message displaying frequency: 10:00 minutes
+couldn't exec controller.cfg
+Executing server.cfg 
+Weapons allowed: knives pistols SMGs rifles shotguns 
+Server logging data to file logs\L1012003.log
+L 10/12/2026 - 22:00:46: client_putinserver: id=1 name="Bot Neo" bot=1
+L 10/12/2026 - 22:00:46: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.4ms.
+[ts] bots: added "Bot Neo" (#1)
+L 10/12/2026 - 22:00:46: client_putinserver: id=2 name="Bot Trinity" bot=1
+L 10/12/2026 - 22:00:46: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.2ms.
+[ts] bots: added "Bot Trinity" (#2)
+   VAC secure mode disabled.
+L 10/12/2026 - 22:00:47: client_putinserver: id=3 name="Bot Morpheus" bot=1
+L 10/12/2026 - 22:00:47: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.3ms.
+[ts] bots: added "Bot Morpheus" (#3)
+L 10/12/2026 - 22:00:47: client_putinserver: id=4 name="Bot Niobe" bot=1
+L 10/12/2026 - 22:00:47: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.3ms.
+[ts] bots: added "Bot Niobe" (#4)
+L 10/12/2026 - 22:00:54: DeathMsg: killer=1 "Bot Neo" victim=4 "Bot Niobe"
+L 10/12/2026 - 22:00:54: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.4ms.
+L 10/12/2026 - 22:00:55: DeathMsg: killer=3 "Bot Morpheus" victim=2 "Bot Trinity"
+L 10/12/2026 - 22:00:55: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.5ms.
+L 10/12/2026 - 22:00:55: probe: 4 players
+L 10/12/2026 - 22:00:55:   id=1 "Bot Neo" alive=1 hp=93 frags=1 origin=(-570.8 582.4 21.0) classname check=1
+L 10/12/2026 - 22:00:55:   set_user_health(1, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:55:   id=2 "Bot Trinity" alive=0 hp=-11 frags=0 origin=(32.2 -137.2 37.0) classname check=1
+L 10/12/2026 - 22:00:55:   id=3 "Bot Morpheus" alive=1 hp=16 frags=1 origin=(54.7 -351.3 36.0) classname check=1
+L 10/12/2026 - 22:00:55:   set_user_health(3, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:55:   id=4 "Bot Niobe" alive=0 hp=-3 frags=0 origin=(-602.9 773.4 7.3) classname check=1
+L 10/12/2026 - 22:00:55: [amxx_test.amxx] performance issue. Function probe executed more than 9.4ms.
+L 10/12/2026 - 22:01:05: probe: 4 players
+L 10/12/2026 - 22:01:05:   id=1 "Bot Neo" alive=1 hp=123 frags=1 origin=(-1629.4 555.5 -19.9) classname check=1
+L 10/12/2026 - 22:01:05:   id=2 "Bot Trinity" alive=1 hp=33 frags=0 origin=(175.1 -186.0 36.0) classname check=1
+L 10/12/2026 - 22:01:05:   set_user_health(2, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:01:05:   id=3 "Bot Morpheus" alive=1 hp=87 frags=1 origin=(232.0 -1104.5 -15.0) classname check=1
+L 10/12/2026 - 22:01:05:   id=4 "Bot Niobe" alive=1 hp=84 frags=0 origin=(991.6 -268.0 -19.9) classname check=1
+L 10/12/2026 - 22:01:05:   set_user_health(4, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:01:05: [amxx_test.amxx] performance issue. Function probe executed more than 8.7ms.
+L 10/12/2026 - 22:01:05: run: 4 players
+L 10/12/2026 - 22:01:05:   id=1 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=1 get_pdata_int(id, 100) = 1342761416 (0x5008e9c8)
+L 10/12/2026 - 22:01:05:   id=1 get_pdata_int(id, 0, 0, 0) = 203 (0xcb)
+L 10/12/2026 - 22:01:05:   id=2 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=2 get_pdata_int(id, 100) = 7077988 (0x6c0064)
+L 10/12/2026 - 22:01:05:   id=2 get_pdata_int(id, 0, 0, 0) = 204 (0xcc)
+L 10/12/2026 - 22:01:05:   id=3 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=3 get_pdata_int(id, 100) = 1952542056 (0x74616d68)
+L 10/12/2026 - 22:01:05:   id=3 get_pdata_int(id, 0, 0, 0) = 205 (0xcd)
+L 10/12/2026 - 22:01:05:   id=4 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=4 get_pdata_int(id, 100) = 1952542056 (0x74616d68)
+L 10/12/2026 - 22:01:05:   id=4 get_pdata_int(id, 0, 0, 0) = 206 (0xce)
+L 10/12/2026 - 22:01:05: run: done
+L 10/12/2026 - 22:01:05: [pdata_test.amxx] performance issue. Function run executed more than 18.2ms.
+L 10/12/2026 - 22:01:06: DeathMsg: killer=3 "Bot Morpheus" victim=4 "Bot Niobe"
+L 10/12/2026 - 22:01:06: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.5ms.
+L 10/12/2026 - 22:01:14: DeathMsg: killer=4 "Bot Niobe" victim=2 "Bot Trinity"
+L 10/12/2026 - 22:01:14: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.4ms.

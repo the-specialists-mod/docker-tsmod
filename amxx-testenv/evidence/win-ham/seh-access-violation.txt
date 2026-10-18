@@ -1,0 +1,40 @@
+0120:trace:seh:dispatch_exception code=c0000005 (EXCEPTION_ACCESS_VIOLATION) flags=0 addr=000000007506A204
+0120:trace:seh:dispatch_exception  info[0]=0000000000000000
+0120:trace:seh:dispatch_exception  info[1]=00000000000000E7
+0120:trace:seh:dispatch_exception rip=000000007bc51110 rsp=00007ffffe20f5e0 rbp=000000000021df34 eflags=00010256
+0120:trace:seh:dispatch_exception rax=0000000000000007 rbx=0000000000000000 rcx=0000000000000000 rdx=00000000000000cb
+0120:trace:seh:dispatch_exception rsi=0000000007c34588 rdi=000000007509bf5f  r8=0000000000000000  r9=0000000000000000
+0120:trace:seh:dispatch_exception r10=0000000000000000 r11=0000000000000202 r12=000000007ffd8000 r13=00007ffffe20fd24
+0120:trace:seh:dispatch_exception r14=00007ffffe20f5e0 r15=0000000000000000 mxcsr=00001fb0 cs=0033 ss=0000
+0120:trace:seh:call_seh_handlers calling handler 00006FFFFC3C1564 (rec=00007FFFFE20F3D0, frame=7ffffe20f630 context=00007FFFFE20EEE0, dispatch=00007FFFFE20E7F0)
+0120:trace:seh:RtlGetExtendedContextLength2 context_flags 0x1007f, length 00007FFFFE20E384, compaction_mask ffffffffffffffff.
+0120:trace:seh:RtlInitializeExtendedContext2 context 000000000021D288, context_flags 0x1007f, context_ex 00007FFFFE20E388, compaction_mask ffffffffffffffff.
+0120:trace:seh:RtlCopyExtendedContext dst 000000000021D554, context_flags 0x10040, src 00007FFFFE20F3B0.
+0120:trace:seh:RtlUnwindEx code=c0000005 flags=2 end_frame=00007FFFFE20F630 target_ip=00006FFFFC3C155C
+0120:trace:seh:RtlUnwindEx  info[0]=0000000000000000
+0120:trace:seh:RtlUnwindEx  info[1]=00000000000000e7
+0120:trace:seh:RtlUnwindEx rip=00006fffffbdbbcd rsp=00007ffffe20db80 rbp=000000007ffda000 eflags=00000202
+0120:trace:seh:RtlUnwindEx rax=000000007ffd8000 rbx=00007ffffe20f3d0 rcx=00007ffffe20e230 rdx=00006ffffc3c155c
+0120:trace:seh:RtlUnwindEx rsi=00007ffffe20e230 rdi=00007ffffe20f630  r8=00007ffffe20f3d0  r9=000000000000001d
+0120:trace:seh:RtlUnwindEx r10=00007ffffe20e390 r11=0000000000000202 r12=00007ffffe20dce0 r13=00006fffffc23900
+0120:trace:seh:RtlUnwindEx r14=0000000000000000 r15=000000007ffd8000 mxcsr=00001fb0 cs=0033 ss=002b
+0120:trace:seh:RtlRestoreContext returning to 00006FFFFC3C155C stack 00007FFFFE20F630
+0120:trace:seh:dispatch_exception code=c0000005 (EXCEPTION_ACCESS_VIOLATION) flags=0 addr=7506A204
+0120:trace:seh:dispatch_exception  info[0]=00000000
+0120:trace:seh:dispatch_exception  info[1]=000000E7
+0120:trace:seh:dispatch_exception eip=7506a204 esp=0021d6ec ebp=0021df34 eflags=00010256
+0120:trace:seh:dispatch_exception eax=00000007 ebx=00000000 ecx=00000000 edx=000000cb
+0120:trace:seh:dispatch_exception esi=07c34588 edi=7509bf5f cs=0023 ds=002b es=002b fs=0063 gs=002b ss=002b
+0120:trace:seh:call_seh_handlers calling handler at 7509A0CD code=c0000005 flags=0
+0120:trace:seh:call_seh_handlers handler at 7509A0CD returned 1
+0120:trace:seh:call_seh_handlers calling handler at 04A2F186 code=c0000005 flags=0
+0120:trace:seh:call_seh_handlers handler at 04A2F186 returned 1
+0120:trace:seh:call_seh_handlers calling handler at 04A2E4F5 code=c0000005 flags=0
+0120:trace:seh:call_seh_handlers handler at 04A2E4F5 returned 1
+0120:trace:seh:call_seh_handlers calling handler at 04A2E145 code=c0000005 flags=0
+0120:trace:seh:call_seh_handlers handler at 04A2E145 returned 1
+0120:trace:seh:call_seh_handlers calling handler at 00421CA0 code=c0000005 flags=0
+0120:trace:seh:__regs_RtlUnwind code=c0000027 flags=2
+0120:trace:seh:__regs_RtlUnwind eip=004079a9 esp=0021d108 ebp=0021d118 eflags=00000216
+0120:trace:seh:__regs_RtlUnwind eax=00000000 ebx=0022fedc ecx=002dbca0 edx=00000000
+0120:trace:seh:__regs_RtlUnwind esi=00000000 edi=0042a0b8 cs=0023 ds=002b es=002b fs=0063 gs=0000 ss=002b

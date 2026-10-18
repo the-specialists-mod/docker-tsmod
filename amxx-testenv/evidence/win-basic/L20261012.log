@@ -1,0 +1,24 @@
+L 10/12/2026 - 21:59:52: GameConfig CRC computed engine=D9A5B505 (Z:\home\mmckenzie\games\amxx_rehlds_win\swds.dll)
+L 10/12/2026 - 21:59:52: GameConfig CRC computed server=B4F51E6E (z:\home\mmckenzie\games\amxx_rehlds_win\ts\dlls\mp.dll)
+L 10/12/2026 - 21:59:52: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected 2C9EDE6B got D9A5B505
+L 10/12/2026 - 21:59:52: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected F3A7F2F1 got D9A5B505
+L 10/12/2026 - 21:59:52: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "windows" expected 2C9EDE6B got D9A5B505
+L 10/12/2026 - 21:59:52: [FAKEMETA] get/set_gamerules_* natives have been disabled because g_pGameRules address could not be found. 
+L 10/12/2026 - 21:59:52: -------- Mapchange to ts_dojo --------
+L 10/12/2026 - 21:59:53: [amxx_test.amxx] performance issue. Function plugin_init executed more than 1.8ms.
+L 10/12/2026 - 21:59:53: [amxx_test.amxx] performance issue. Function plugin_cfg executed more than 3.7ms.
+L 10/12/2026 - 21:59:55: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.4ms.
+L 10/12/2026 - 21:59:56: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.3ms.
+L 10/12/2026 - 21:59:56: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.5ms.
+L 10/12/2026 - 21:59:57: [amxx_test.amxx] performance issue. Function client_putinserver executed more than 1.4ms.
+L 10/12/2026 - 22:00:03: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.2ms.
+L 10/12/2026 - 22:00:04: [amxx_test.amxx] performance issue. Function probe executed more than 8.6ms.
+L 10/12/2026 - 22:00:12: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.4ms.
+L 10/12/2026 - 22:00:14: [amxx_test.amxx] performance issue. Function probe executed more than 6.3ms.
+L 10/12/2026 - 22:00:19: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.8ms.
+L 10/12/2026 - 22:00:20: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.5ms.
+L 10/12/2026 - 22:00:24: [amxx_test.amxx] performance issue. Function probe executed more than 6.1ms.
+L 10/12/2026 - 22:00:26: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.6ms.
+L 10/12/2026 - 22:00:31: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.4ms.
+L 10/12/2026 - 22:00:34: [amxx_test.amxx] performance issue. Function probe executed more than 8.4ms.
+L 10/12/2026 - 22:00:40: [amxx_test.amxx] performance issue. Function ev_death executed more than 1.1ms.

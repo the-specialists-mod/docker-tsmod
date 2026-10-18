@@ -1,0 +1,2 @@
+L 10/12/2026 - 21:58:40: Log file started (file "ts/addons/amxmodx/logs/ham_test.log") (game "ts") (amx "1.10.0.5487")
+L 10/12/2026 - 21:58:40: plugin_init: IsHamValid(Ham_Spawn)=1; calling RegisterHam(Ham_Spawn, "player")

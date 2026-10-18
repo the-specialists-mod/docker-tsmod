@@ -1,0 +1,16 @@
+L 10/12/2026 - 22:00:43: Log file started (file "ts\addons\amxmodx\logs\pdata_test.log") (game "ts") (amx "1.10.0.5487")
+L 10/12/2026 - 22:00:43: plugin_init
+L 10/12/2026 - 22:01:05: run: 4 players
+L 10/12/2026 - 22:01:05:   id=1 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=1 get_pdata_int(id, 100) = 1342761416 (0x5008e9c8)
+L 10/12/2026 - 22:01:05:   id=1 get_pdata_int(id, 0, 0, 0) = 203 (0xcb)
+L 10/12/2026 - 22:01:05:   id=2 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=2 get_pdata_int(id, 100) = 7077988 (0x6c0064)
+L 10/12/2026 - 22:01:05:   id=2 get_pdata_int(id, 0, 0, 0) = 204 (0xcc)
+L 10/12/2026 - 22:01:05:   id=3 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=3 get_pdata_int(id, 100) = 1952542056 (0x74616d68)
+L 10/12/2026 - 22:01:05:   id=3 get_pdata_int(id, 0, 0, 0) = 205 (0xcd)
+L 10/12/2026 - 22:01:05:   id=4 pev_valid=2 (2 = has private data); calling get_pdata_int(id, 100)
+L 10/12/2026 - 22:01:05:   id=4 get_pdata_int(id, 100) = 1952542056 (0x74616d68)
+L 10/12/2026 - 22:01:05:   id=4 get_pdata_int(id, 0, 0, 0) = 206 (0xce)
+L 10/12/2026 - 22:01:05: run: done

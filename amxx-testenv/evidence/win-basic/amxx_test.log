@@ -1,0 +1,38 @@
+L 10/12/2026 - 21:59:53: Log file started (file "ts\addons\amxmodx\logs\amxx_test.log") (game "ts") (amx "1.10.0.5487")
+L 10/12/2026 - 21:59:53: plugin_init: map=ts_dojo mod=ts maxplayers=8
+L 10/12/2026 - 21:59:53: plugin_cfg
+L 10/12/2026 - 21:59:55: client_putinserver: id=1 name="Bot Neo" bot=1
+L 10/12/2026 - 21:59:56: client_putinserver: id=2 name="Bot Trinity" bot=1
+L 10/12/2026 - 21:59:56: client_putinserver: id=3 name="Bot Morpheus" bot=1
+L 10/12/2026 - 21:59:57: client_putinserver: id=4 name="Bot Niobe" bot=1
+L 10/12/2026 - 22:00:03: DeathMsg: killer=2 "Bot Trinity" victim=3 "Bot Morpheus"
+L 10/12/2026 - 22:00:04: probe: 4 players
+L 10/12/2026 - 22:00:04:   id=1 "Bot Neo" alive=1 hp=100 frags=0 origin=(99.7 934.0 89.7) classname check=1
+L 10/12/2026 - 22:00:04:   set_user_health(1, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:04:   id=2 "Bot Trinity" alive=1 hp=149 frags=1 origin=(26.9 -438.7 36.0) classname check=1
+L 10/12/2026 - 22:00:04:   set_user_health(2, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:04:   id=3 "Bot Morpheus" alive=0 hp=-14 frags=0 origin=(-27.5 -714.6 27.8) classname check=1
+L 10/12/2026 - 22:00:04:   id=4 "Bot Niobe" alive=1 hp=100 frags=0 origin=(-308.5 86.4 546.2) classname check=1
+L 10/12/2026 - 22:00:04:   set_user_health(4, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:12: DeathMsg: killer=2 "Bot Trinity" victim=3 "Bot Morpheus"
+L 10/12/2026 - 22:00:14: probe: 4 players
+L 10/12/2026 - 22:00:14:   id=1 "Bot Neo" alive=1 hp=123 frags=0 origin=(619.7 984.7 -19.9) classname check=1
+L 10/12/2026 - 22:00:14:   id=2 "Bot Trinity" alive=1 hp=113 frags=2 origin=(71.2 -984.8 1.1) classname check=1
+L 10/12/2026 - 22:00:14:   id=3 "Bot Morpheus" alive=0 hp=-12 frags=0 origin=(-42.8 -440.9 36.0) classname check=1
+L 10/12/2026 - 22:00:14:   id=4 "Bot Niobe" alive=1 hp=12 frags=0 origin=(-293.9 -516.1 86.5) classname check=1
+L 10/12/2026 - 22:00:19: DeathMsg: killer=2 "Bot Trinity" victim=3 "Bot Morpheus"
+L 10/12/2026 - 22:00:20: DeathMsg: killer=2 "Bot Trinity" victim=4 "Bot Niobe"
+L 10/12/2026 - 22:00:24: probe: 4 players
+L 10/12/2026 - 22:00:24:   id=1 "Bot Neo" alive=1 hp=123 frags=0 origin=(1024.9 508.4 -19.9) classname check=1
+L 10/12/2026 - 22:00:24:   id=2 "Bot Trinity" alive=1 hp=68 frags=5 origin=(239.9 -1111.9 -33.9) classname check=1
+L 10/12/2026 - 22:00:24:   id=3 "Bot Morpheus" alive=0 hp=1 frags=0 origin=(-9.9 -902.3 9.3) classname check=1
+L 10/12/2026 - 22:00:24:   id=4 "Bot Niobe" alive=0 hp=1 frags=0 origin=(63.2 -316.6 36.0) classname check=1
+L 10/12/2026 - 22:00:26: DeathMsg: killer=3 "Bot Morpheus" victim=2 "Bot Trinity"
+L 10/12/2026 - 22:00:31: DeathMsg: killer=3 "Bot Morpheus" victim=4 "Bot Niobe"
+L 10/12/2026 - 22:00:34: probe: 4 players
+L 10/12/2026 - 22:00:34:   id=1 "Bot Neo" alive=1 hp=123 frags=0 origin=(370.4 833.2 35.3) classname check=1
+L 10/12/2026 - 22:00:34:   id=2 "Bot Trinity" alive=1 hp=100 frags=5 origin=(-104.9 -1062.6 -6.5) classname check=1
+L 10/12/2026 - 22:00:34:   id=3 "Bot Morpheus" alive=1 hp=64 frags=2 origin=(28.0 268.9 36.0) classname check=1
+L 10/12/2026 - 22:00:34:   set_user_health(3, 123) -> get_user_health=123 EV_FL_health=123.0
+L 10/12/2026 - 22:00:34:   id=4 "Bot Niobe" alive=0 hp=1 frags=0 origin=(-939.9 16.0 -19.9) classname check=1
+L 10/12/2026 - 22:00:40: DeathMsg: killer=3 "Bot Morpheus" victim=2 "Bot Trinity"

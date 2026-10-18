@@ -1,0 +1,25 @@
+L 10/12/2026 - 21:55:25: GameConfig CRC computed engine=E9E42234 (/home/mmckenzie/games/amxx_rehlds_linux/engine_i486.so)
+L 10/12/2026 - 21:55:25: GameConfig CRC computed server=D0E15EF2 (/home/mmckenzie/games/amxx_rehlds_linux/ts/dlls/ts_i386.so)
+L 10/12/2026 - 21:55:25: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:55:25: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "linux" expected 48E4E4D5 got E9E42234
+L 10/12/2026 - 21:55:25: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:55:25: [FAKEMETA] get/set_gamerules_* natives have been disabled because g_pGameRules address could not be found. 
+L 10/12/2026 - 21:55:25: -------- Mapchange to ts_dojo --------
+L 10/12/2026 - 21:56:12: [admincmd.amxx] Cmd: "The Specialists HD<0><><>" ask for players list
+L 10/12/2026 - 21:56:17: [adminchat.amxx] Chat: "The Specialists HD<0><><>" say "hello from amxx
+"
+L 10/12/2026 - 21:56:20: [admincmd.amxx] Kick: "The Specialists HD<0><><>" kick "Bot Niobe<4><BOT><>" (reason "")
+L 10/12/2026 - 21:57:54: GameConfig CRC computed engine=E9E42234 (/home/mmckenzie/games/amxx_rehlds_linux/engine_i486.so)
+L 10/12/2026 - 21:57:54: GameConfig CRC computed server=D0E15EF2 (/home/mmckenzie/games/amxx_rehlds_linux/ts/dlls/ts_i386.so)
+L 10/12/2026 - 21:57:54: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:57:54: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "linux" expected 48E4E4D5 got E9E42234
+L 10/12/2026 - 21:57:54: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:57:54: [FAKEMETA] get/set_gamerules_* natives have been disabled because g_pGameRules address could not be found. 
+L 10/12/2026 - 21:57:54: -------- Mapchange to ts_dojo --------
+L 10/12/2026 - 21:58:40: GameConfig CRC computed engine=E9E42234 (/home/mmckenzie/games/amxx_rehlds_linux/engine_i486.so)
+L 10/12/2026 - 21:58:40: GameConfig CRC computed server=D0E15EF2 (/home/mmckenzie/games/amxx_rehlds_linux/ts/dlls/ts_i386.so)
+L 10/12/2026 - 21:58:40: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:58:40: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "linux" expected 48E4E4D5 got E9E42234
+L 10/12/2026 - 21:58:40: GameConfig CRC mismatch for game "*" section "*" library "engine" platform "<unknown>" expected ???????? got E9E42234
+L 10/12/2026 - 21:58:40: [FAKEMETA] get/set_gamerules_* natives have been disabled because g_pGameRules address could not be found. 
+L 10/12/2026 - 21:58:40: -------- Mapchange to ts_dojo --------

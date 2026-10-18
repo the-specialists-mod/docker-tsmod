@@ -50,6 +50,13 @@ The drop-in's `steamclient.so` is the desktop Steam client's (it needs X11 and G
 uses steamcmd's 64-bit one. The rest (steamcmd's HLDS, the TS content, the settings below) is the same as the 32-bit image, which
 stays the default. The engine doesn't need 32-bit libraries then, and the image has none.
 
+## AMX Mod X test environment
+
+[`amxx-testenv/`](amxx-testenv/README.md) has the scripts that build the AMX Mod X test servers
+the AMXX module repos (tsmod-amxx-rs, tsmod-amxx-rcbot) run their end-to-end tests on:
+ReHLDS roots for Linux, Windows under Wine and 64-bit Linux (buildchain's drop-in, like
+`ARCH=amd64` here), in `~/games`, not in containers. It isn't part of the image.
+
 ## Settings
 
 | Variable | Default | |
