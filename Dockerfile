@@ -118,13 +118,13 @@ RUN cd /hlds/ts \
  && rm -f case-aliases.txt MISSING_RESOURCES.md
 
 # --- Metamod-R and AMX Mod X, with the Rust port's tsx/tsfun/hamsandwich modules ---------------
-# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.3.0 =
-# port v3.0.8). Metamod sits between the engine and the game library; the entrypoint's AMXX
+# AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.3.0 and
+# v0.4.0 = port v3.0.8; v0.4.0 adds the x86_64 modules the 64-bit image uses). Metamod sits between the engine and the game library; the entrypoint's AMXX
 # setting chooses which one liblist.gam names.
 FROM debian:${DEBIAN} AS amxx-i386
 ARG METAMOD_R_VERSION=1.3.0.149
 ARG AMXX_VERSION=1.10.0-git5487
-ARG AMXX_MODULES_VERSION=v0.3.0
+ARG AMXX_MODULES_VERSION=v0.4.0
 # amxxpc, the plugin compiler, is 32-bit.
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip lib32stdc++6 \
@@ -148,30 +148,11 @@ RUN curl -fsSL -o /tmp/mm.zip \
  && [ -f amxmodx/modules/tsx_amxx_i386.so ] && [ -f amxmodx/plugins/mapchooser.amxx ] \
  && rm -rf /tmp/*
 
-# tsmod-amxx-rs has no 64-bit release yet: build tsx, tsfun and hamsandwich for x86_64 from
-# AMXX_MODULES_REF, a commit (or tag) with its 64-bit support (c364295, after v0.3.0: plugin API 7,
-# port v3.0.8).
-FROM rust:1-bookworm AS amxx-modules-amd64
-ARG AMXX_MODULES_REF=c36429538fdf95ef0b1c72a8a80f553b924f68ca
-# goldsrc-sys generates its bindings from the FWGS headers: the commit tsmod-amxx-rs's release uses.
-ARG FWGS_COMMIT=51353ff8d65e58300eeb2bd014867673f1f367c6
-RUN apt-get update \
- && apt-get install -y --no-install-recommends libclang-dev \
- && rm -rf /var/lib/apt/lists/*
-RUN git clone --filter=blob:none https://github.com/FWGS/xash3d-fwgs /src/xash3d-fwgs \
- && git -C /src/xash3d-fwgs checkout -q "$FWGS_COMMIT" \
- && git -C /src/xash3d-fwgs submodule update --init 3rdparty/library_suffix \
- && git clone --filter=blob:none https://github.com/the-specialists-mod/tsmod-amxx-rs /src/tsmod-amxx-rs \
- && git -C /src/tsmod-amxx-rs checkout -q "$AMXX_MODULES_REF"
-WORKDIR /src/tsmod-amxx-rs
-RUN FWGS_DIR=/src/xash3d-fwgs cargo build --release -p tsx -p tsfun -p hamsandwich \
- && m=/out/addons/amxmodx/modules && mkdir -p $m /out/addons/amxmodx/scripting \
- && for n in tsx tsfun hamsandwich; do \
-      strip -o "$m/${n}_amxx_amd64.so" "target/release/lib$n.so"; \
-    done \
- && cp -r include /out/addons/amxmodx/scripting/
-
 FROM debian:${DEBIAN} AS amxx-amd64
+ARG AMXX_MODULES_VERSION=v0.4.0
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl unzip \
+ && rm -rf /var/lib/apt/lists/*
 COPY --from=buildchain /dropin/valve/addons /tmp/addons
 WORKDIR /out/addons
 RUN mkdir metamod \
@@ -180,9 +161,11 @@ RUN mkdir metamod \
  && echo 'linux addons/amxmodx/dlls/amxmodx_mm_amd64.so' > metamod/plugins.ini \
  && cp -a /tmp/addons/amxmodx . \
  && rm amxmodx/configs/maps.ini \
- && rm -rf /tmp/addons
-COPY --from=amxx-modules-amd64 /out/addons /out/addons
-RUN [ -f amxmodx/modules/tsx_amxx_amd64.so ] && [ -f amxmodx/plugins/mapchooser.amxx ]
+ && curl -fsSL -o /tmp/mods.zip \
+      "https://github.com/the-specialists-mod/tsmod-amxx-rs/releases/download/${AMXX_MODULES_VERSION}/tsmod-amxx-rs-${AMXX_MODULES_VERSION}-linux-x86_64.zip" \
+ && unzip -qo /tmp/mods.zip 'addons/*' -d /out \
+ && [ -f amxmodx/modules/tsx_amxx_amd64.so ] && [ -f amxmodx/plugins/mapchooser.amxx ] \
+ && rm -rf /tmp/*
 
 FROM amxx-${ARCH} AS amxx
 WORKDIR /out/addons
