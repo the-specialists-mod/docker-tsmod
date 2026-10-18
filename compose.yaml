@@ -1,6 +1,10 @@
 services:
   tsmod:
-    build: .
+    build:
+      context: .
+      # amd64 for the 64-bit engine (see README.md).
+      args:
+        ARCH: i386
     image: tsmod
     restart: unless-stopped
     ports:

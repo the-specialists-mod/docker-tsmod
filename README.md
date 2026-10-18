@@ -32,6 +32,24 @@ docker run -d --name tsmod \
   tsmod
 ```
 
+### 64-bit
+
+`--build-arg ARCH=amd64` builds a 64-bit server instead:
+
+```sh
+docker build --build-arg ARCH=amd64 --build-arg PORT_VERSION=v3.0.8 -t tsmod:amd64 .
+```
+
+It runs the 64-bit ReHLDS engine, `hlds_linux` and Steam libraries, Metamod-R and AMX Mod X from
+[goldsrc-net/buildchain](https://github.com/goldsrc-net/buildchain)'s drop-in
+(`BUILDCHAIN_VERSION`, default `v1.0.9`), with the port's `ts_amd64.so` and RCBot's
+`tsmod_rcbot_amd64.so` from their `linux-x86_64` releases. tsmod-amxx-rs has no 64-bit release yet, so
+the build compiles tsx, tsfun and hamsandwich for x86_64 from `AMXX_MODULES_REF` (a commit with its
+64-bit support).
+The drop-in's `steamclient.so` is the desktop Steam client's (it needs X11 and GL), so the image
+uses steamcmd's 64-bit one. The rest (steamcmd's HLDS, the TS content, the settings below) is the same as the 32-bit image, which
+stays the default. The engine doesn't need 32-bit libraries then, and the image has none.
+
 ## Settings
 
 | Variable | Default | |
@@ -102,7 +120,7 @@ sv_downloadurl "http://203.0.113.10:27080/"
 sv_allow_dlfile 0
 ```
 
-Build arguments: `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
+Build arguments: `ARCH` (`i386` or `amd64`, see [64-bit](#64-bit)), `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
 (`v0.12.0`), `REHLDS_VERSION` (`3.15.0.896`), `METAMOD_R_VERSION` (`1.3.0.149`), `AMXX_VERSION`
 (`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.3.0`) and `RCBOT_VERSION` (a tsmod-rcbot-rs release, `v0.3.0`). The AMXX modules and RCBot talk to the port
 through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` and `RCBOT_VERSION` v0.3.0

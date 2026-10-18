@@ -11,7 +11,7 @@ if [ -d /custom ] && [ -n "$(ls -A /custom 2>/dev/null)" ]; then
 fi
 
 # AMX Mod X: the engine loads metamod (which loads AMXX and the game library) or the game library.
-if [ "$AMXX" = 1 ]; then gamedll=addons/metamod/metamod_i386.so; else gamedll=dlls/ts_i386.so; fi
+if [ "$AMXX" = 1 ]; then gamedll=addons/metamod/metamod_$LIB_ARCH.so; else gamedll=dlls/ts_$LIB_ARCH.so; fi
 sed -i "s|^gamedll_linux .*|gamedll_linux \"$gamedll\"|" "$TS/liblist.gam"
 echo "entrypoint: AMX Mod X $([ "$AMXX" = 1 ] && echo on || echo off)"
 

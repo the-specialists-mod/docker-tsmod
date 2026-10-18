@@ -1,11 +1,15 @@
 # The Specialists 3.0 dedicated server: HLDS (steam_legacy) with ReHLDS, the Rust port's game
 # library, and nginx serving the game files over HTTP for fast downloads (sv_downloadurl).
+#
+# ARCH=i386 (the default) runs the 32-bit engine. ARCH=amd64 runs a 64-bit one: ReHLDS, Metamod-R
+# and AMX Mod X from goldsrc-net/buildchain's 64-bit build, with the port's and RCBot's x86_64
+# libraries.
 
 ARG DEBIAN=bookworm-slim
+ARG ARCH=i386
 
 # --- HLDS from steamcmd, with the ReHLDS engine over it -------------------------------------
-FROM debian:${DEBIAN} AS hlds
-ARG REHLDS_VERSION=3.15.0.896
+FROM debian:${DEBIAN} AS steamcmd
 RUN dpkg --add-architecture i386 \
  && apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl unzip lib32gcc-s1 lib32stdc++6 \
@@ -19,6 +23,9 @@ RUN for i in 1 2 3 4 5; do \
       [ -f /hlds/valve/liblist.gam ] && [ -f /hlds/hlds_linux ] && break; \
     done \
  && [ -f /hlds/valve/liblist.gam ]
+
+FROM steamcmd AS hlds-i386
+ARG REHLDS_VERSION=3.15.0.896
 RUN curl -fsSL -o /tmp/rehlds.zip \
       "https://github.com/rehlds/ReHLDS/releases/download/${REHLDS_VERSION}/rehlds-bin-${REHLDS_VERSION}.zip" \
  && unzip -q /tmp/rehlds.zip -d /tmp/rehlds \
@@ -26,23 +33,47 @@ RUN curl -fsSL -o /tmp/rehlds.zip \
  && chmod +x /hlds/hlds_linux /hlds/hltv \
  && rm -rf /tmp/rehlds /tmp/rehlds.zip /hlds/steamapps
 
+# buildchain's drop-in: a 64-bit ReHLDS engine, hlds_linux, hltv and the Steam libraries they load
+# (steamcmd's are 32-bit). Its Metamod-R and AMX Mod X go in the amxx stage.
+FROM steamcmd AS buildchain
+ARG BUILDCHAIN_VERSION=v1.0.9
+RUN curl -fsSL -o /tmp/dropin.zip \
+      "https://github.com/goldsrc-net/buildchain/releases/download/${BUILDCHAIN_VERSION}/hlds-dropin-linux-amd64.zip" \
+ && mkdir /dropin && unzip -q /tmp/dropin.zip -d /dropin && rm /tmp/dropin.zip \
+ && [ -f /dropin/engine_i486.so ] && [ -f /dropin/valve/addons/metamod/dlls/metamod_amd64.so ]
+
+# The drop-in's steamclient.so is the desktop client's (it links X11, GL, PipeWire): the server
+# uses steamcmd's 64-bit one.
+FROM steamcmd AS hlds-amd64
+COPY --from=buildchain /dropin /tmp/dropin
+RUN find /tmp/dropin -maxdepth 1 -type f \( -name '*.so' -o -name hlds_linux -o -name hltv \) \
+      ! -name steamclient.so -exec cp {} /hlds/ \; \
+ && cp /steamcmd/linux64/steamclient.so /hlds/steamclient.so \
+ && chmod +x /hlds/hlds_linux /hlds/hltv \
+ && rm -rf /tmp/dropin /hlds/steamapps
+
+FROM hlds-${ARCH} AS hlds
+
 # --- Optional extra content (see the ts stage) ----------------------------------------------
 FROM scratch AS content
 # --- RCBot (the-specialists-mod/tsmod-rcbot-rs), the port's tsmod_rcbot bot plugin ----------
 # The release built for bookworm's glibc (2.36). RCBOT_VERSION must pin the same port release
 # (plugin API version) as PORT_VERSION: v0.3.0 = port v3.0.8.
 FROM debian:${DEBIAN} AS rcbot
+ARG ARCH
 ARG RCBOT_VERSION=v0.3.0
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl \
  && rm -rf /var/lib/apt/lists/*
 RUN mkdir /out \
- && curl -fsSL "https://github.com/the-specialists-mod/tsmod-rcbot-rs/releases/download/${RCBOT_VERSION}/tsmod-rcbot-rs-${RCBOT_VERSION}-linux-i686-glibc2.36.tar.gz" \
+ && platform=$([ "$ARCH" = amd64 ] && echo linux-x86_64 || echo linux-i686) \
+ && curl -fsSL "https://github.com/the-specialists-mod/tsmod-rcbot-rs/releases/download/${RCBOT_VERSION}/tsmod-rcbot-rs-${RCBOT_VERSION}-${platform}-glibc2.36.tar.gz" \
       | tar xz --no-same-owner -C /out ./ts \
- && [ -f /out/ts/dlls/tsmod_rcbot_i386.so ] && [ -d /out/ts/tsmod/rcbot ]
+ && [ -f "/out/ts/dlls/tsmod_rcbot_${ARCH}.so" ] && [ -d /out/ts/tsmod/rcbot ]
 
 # --- TS 3.0 content and the Rust port, installed by the launcher's command line -------------
 FROM debian:${DEBIAN} AS ts
+ARG ARCH
 ARG LAUNCHER_VERSION=v0.12.0
 # A Rust port release tag (the-specialists-mod/the-specialistsmod-rs), or "latest".
 ARG PORT_VERSION=latest
@@ -60,6 +91,18 @@ RUN if [ "$PORT_VERSION" = latest ]; then set -- --port; else set -- --port --po
       ts-launcher install --root /hlds --half-life "$@" \
  && rm -rf /tmp/tsinstaller /tmp/cache \
  && [ -f /hlds/ts/dlls/ts_i386.so ]
+# The launcher installs the port's 32-bit libraries for Half-Life: the 64-bit engine loads the
+# linux-x86_64 release's (ts_amd64.so), the same version.
+RUN [ "$ARCH" = amd64 ] || exit 0; \
+    tag=$PORT_VERSION; \
+    if [ "$tag" = latest ]; then \
+      tag=$(curl -fsSLI -o /dev/null -w '%{url_effective}' \
+        https://github.com/the-specialists-mod/the-specialistsmod-rs/releases/latest); \
+      tag=${tag##*/}; \
+    fi; \
+    curl -fsSL "https://github.com/the-specialists-mod/the-specialistsmod-rs/releases/download/${tag}/the-specialists-rs-${tag}-linux-x86_64.tar.gz" \
+      | tar xz --no-same-owner -C /hlds ts/dlls ts/cl_dlls \
+ && [ -f /hlds/ts/dlls/ts_amd64.so ]
 # Extra content baked in over ts/: empty unless built with --build-context content=<dir>, e.g. a
 # map pack. A case-aliases.txt in it ("referenced path<TAB>actual path" lines) gets symlinks, since
 # maps made on Windows often spell a file differently from its name and Linux is case-sensitive.
@@ -78,7 +121,7 @@ RUN cd /hlds/ts \
 # AMXX_MODULES_VERSION must be built against PORT_VERSION's plugin API (tsmod-amxx-rs v0.3.0 =
 # port v3.0.8). Metamod sits between the engine and the game library; the entrypoint's AMXX
 # setting chooses which one liblist.gam names.
-FROM debian:${DEBIAN} AS amxx
+FROM debian:${DEBIAN} AS amxx-i386
 ARG METAMOD_R_VERSION=1.3.0.149
 ARG AMXX_VERSION=1.10.0-git5487
 ARG AMXX_MODULES_VERSION=v0.3.0
@@ -104,6 +147,45 @@ RUN curl -fsSL -o /tmp/mm.zip \
  && rm amxmodx/configs/maps.ini \
  && [ -f amxmodx/modules/tsx_amxx_i386.so ] && [ -f amxmodx/plugins/mapchooser.amxx ] \
  && rm -rf /tmp/*
+
+# tsmod-amxx-rs has no 64-bit release yet: build tsx, tsfun and hamsandwich for x86_64 from
+# AMXX_MODULES_REF, a commit (or tag) with its 64-bit support (c364295, after v0.3.0: plugin API 7,
+# port v3.0.8).
+FROM rust:1-bookworm AS amxx-modules-amd64
+ARG AMXX_MODULES_REF=c36429538fdf95ef0b1c72a8a80f553b924f68ca
+# goldsrc-sys generates its bindings from the FWGS headers: the commit tsmod-amxx-rs's release uses.
+ARG FWGS_COMMIT=51353ff8d65e58300eeb2bd014867673f1f367c6
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libclang-dev \
+ && rm -rf /var/lib/apt/lists/*
+RUN git clone --filter=blob:none https://github.com/FWGS/xash3d-fwgs /src/xash3d-fwgs \
+ && git -C /src/xash3d-fwgs checkout -q "$FWGS_COMMIT" \
+ && git -C /src/xash3d-fwgs submodule update --init 3rdparty/library_suffix \
+ && git clone --filter=blob:none https://github.com/the-specialists-mod/tsmod-amxx-rs /src/tsmod-amxx-rs \
+ && git -C /src/tsmod-amxx-rs checkout -q "$AMXX_MODULES_REF"
+WORKDIR /src/tsmod-amxx-rs
+RUN FWGS_DIR=/src/xash3d-fwgs cargo build --release -p tsx -p tsfun -p hamsandwich \
+ && m=/out/addons/amxmodx/modules && mkdir -p $m /out/addons/amxmodx/scripting \
+ && for n in tsx tsfun hamsandwich; do \
+      strip -o "$m/${n}_amxx_amd64.so" "target/release/lib$n.so"; \
+    done \
+ && cp -r include /out/addons/amxmodx/scripting/
+
+FROM debian:${DEBIAN} AS amxx-amd64
+COPY --from=buildchain /dropin/valve/addons /tmp/addons
+WORKDIR /out/addons
+RUN mkdir metamod \
+ && cp /tmp/addons/metamod/dlls/metamod_amd64.so /tmp/addons/metamod/config.ini metamod/ \
+ && printf '\ngamedll dlls/ts_amd64.so\n' >> metamod/config.ini \
+ && echo 'linux addons/amxmodx/dlls/amxmodx_mm_amd64.so' > metamod/plugins.ini \
+ && cp -a /tmp/addons/amxmodx . \
+ && rm amxmodx/configs/maps.ini \
+ && rm -rf /tmp/addons
+COPY --from=amxx-modules-amd64 /out/addons /out/addons
+RUN [ -f amxmodx/modules/tsx_amxx_amd64.so ] && [ -f amxmodx/plugins/mapchooser.amxx ]
+
+FROM amxx-${ARCH} AS amxx
+WORKDIR /out/addons
 # Plugins of this repo (plugins/*.sma), compiled and enabled.
 COPY plugins /tmp/plugins
 RUN sc=amxmodx/scripting \
@@ -117,18 +199,21 @@ RUN sc=amxmodx/scripting \
  && rm -rf /tmp/plugins
 
 FROM ts AS ts-amxx
+ARG ARCH
 COPY --from=amxx /out/addons /hlds/ts/addons
-# Metamod-R tells plugins the game library is dlls/ts_i686.so (its known-games name for TS) even
-# when config.ini's gamedll loads ts_i386.so, and tsx looks the port's plugin API up there. That
-# name holds TS 3.0's original library, which nothing loads: make it the port's.
-RUN ln -sf ts_i386.so /hlds/ts/dlls/ts_i686.so
+# Metamod-R tells plugins the game library is dlls/ts_i686.so (its known-games name for TS, in the
+# 64-bit build too) even when config.ini's gamedll loads ts_i386.so, and tsx looks the port's
+# plugin API up there. That name holds TS 3.0's original library, which nothing loads: make it the
+# port's.
+RUN ln -sf "ts_${ARCH}.so" /hlds/ts/dlls/ts_i686.so
 COPY --from=rcbot /out/ts /hlds/ts/
 
 # --- Runtime -------------------------------------------------------------------------------
 FROM debian:${DEBIAN}
-RUN dpkg --add-architecture i386 \
+ARG ARCH
+RUN if [ "$ARCH" = i386 ]; then set -- lib32gcc-s1 lib32stdc++6; dpkg --add-architecture i386; fi \
  && apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl lib32gcc-s1 lib32stdc++6 nginx-light tini \
+ && apt-get install -y --no-install-recommends ca-certificates curl nginx-light tini "$@" \
  && rm -rf /var/lib/apt/lists/* \
  && useradd -m -u 1000 tsmod \
  && mkdir /data && chown tsmod:tsmod /data
@@ -137,11 +222,13 @@ COPY nginx.conf /etc/nginx/tsmod.conf
 COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 USER tsmod
 # HLDS's Steam API looks for the client library here, and needs the app id (Half-Life, 70).
-RUN mkdir -p /home/tsmod/.steam/sdk32 && ln -s /hlds/steamclient.so /home/tsmod/.steam/sdk32/steamclient.so \
+RUN sdk=$([ "$ARCH" = amd64 ] && echo sdk64 || echo sdk32) \
+ && mkdir -p "/home/tsmod/.steam/$sdk" && ln -s /hlds/steamclient.so "/home/tsmod/.steam/$sdk/steamclient.so" \
  && echo 70 > /hlds/steam_appid.txt
 WORKDIR /hlds
 
-ENV PORT=27015 \
+ENV LIB_ARCH=${ARCH} \
+    PORT=27015 \
     HTTP_PORT=27080 \
     MAP=ts_dojo \
     MAXPLAYERS=16 \
