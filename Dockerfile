@@ -168,7 +168,20 @@ RUN mkdir metamod \
  && rm -rf /tmp/*
 
 FROM amxx-${ARCH} AS amxx
+ARG ARCH
+# rcbot_amxx (the-specialists-mod/tsmod-amxx-rcbot): RCBot as an AMX Mod X plugin with its
+# modules (rcbot_megahal, rcbot_learn, rcbot_nav), the alternative to tsmod_rcbot. Installed but
+# not in plugins.ini: the entrypoint enables it for BOT_BACKEND=rcbot_amxx. AMXX_RCBOT_VERSION
+# must be built for the same plugin API as AMXX_MODULES_VERSION (v0.2.0 = tsmod-amxx-rs v0.4.0).
+# Its tsmod/rcbot data is the rcbot stage's.
+ARG AMXX_RCBOT_VERSION=v0.2.0
 WORKDIR /out/addons
+RUN platform=$([ "$ARCH" = amd64 ] && echo linux-x86_64 || echo linux-i686) \
+ && curl -fsSL -o /tmp/rcbot_amxx.zip \
+      "https://github.com/the-specialists-mod/tsmod-amxx-rcbot/releases/download/${AMXX_RCBOT_VERSION}/tsmod-amxx-rcbot-${AMXX_RCBOT_VERSION}-${platform}.zip" \
+ && unzip -qo /tmp/rcbot_amxx.zip 'addons/*' -d /out \
+ && [ -f amxmodx/plugins/rcbot_amxx.amxx ] && [ -f "amxmodx/modules/rcbot_nav_amxx_${ARCH}.so" ] \
+ && rm -f /tmp/rcbot_amxx.zip
 # Plugins of this repo (plugins/*.sma), compiled and enabled.
 COPY plugins /tmp/plugins
 RUN sc=amxmodx/scripting \

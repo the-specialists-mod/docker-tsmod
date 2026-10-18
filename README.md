@@ -73,7 +73,7 @@ ReHLDS roots for Linux, Windows under Wine and 64-bit Linux (buildchain's drop-i
 | `RCON_PASSWORD` | | empty turns rcon off |
 | `SV_PASSWORD` | | join password |
 | `BOTS` | `8` | the port's `ts_bot_quota` |
-| `BOT_BACKEND` | | the port's `ts_bot_backend`: `rcbot` for RCBot's bots, `native` for TS's own; empty leaves it to `server.cfg` (native unless it says otherwise). Like `GAMEPLAY`, the first map loads once more with it |
+| `BOT_BACKEND` | | the port's `ts_bot_backend`: `rcbot` for RCBot's bots, `rcbot_amxx` for RCBot as an AMX Mod X plugin ([tsmod-amxx-rcbot](https://github.com/the-specialists-mod/tsmod-amxx-rcbot): the bot logic in Pawn, for admins who change it; needs `AMXX=1`, turns tsmod_rcbot off, and costs the server more CPU), `native` for TS's own; empty leaves it to `server.cfg` (native unless it says otherwise). Like `GAMEPLAY`, the first map loads once more with it |
 | `AMXX` | `1` | `0` runs the game library without metamod and AMX Mod X |
 | `GAMEPLAY` | | the port's `ts_gameplay`: `21` plays by TS 2.1's rules, `30` by 3.0's; empty leaves it to `server.cfg` (3.0 unless it says otherwise). The engine runs the server config after the first map has loaded, so in 2.1 mode that map loads once more under 2.1 before anyone joins. TS 3.0's original client can't join a 2.1 server, only the Rust port's |
 | `EXTRA_ARGS` | | more `hlds_linux` arguments, e.g. `-pingboost 2 +sys_ticrate 1000` |
@@ -128,8 +128,8 @@ sv_allow_dlfile 0
 
 Build arguments: `ARCH` (`i386` or `amd64`, see [64-bit](#64-bit)), `PORT_VERSION` (a Rust port release tag, default `latest`), `LAUNCHER_VERSION`
 (`v0.12.0`), `REHLDS_VERSION` (`3.15.0.896`), `METAMOD_R_VERSION` (`1.3.0.149`), `AMXX_VERSION`
-(`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.4.0`) and `RCBOT_VERSION` (a tsmod-rcbot-rs release, `v0.3.0`). The AMXX modules and RCBot talk to the port
-through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` v0.4.0 and `RCBOT_VERSION` v0.3.0
+(`1.10.0-git5487`), `AMXX_MODULES_VERSION` (`v0.4.0`), `AMXX_RCBOT_VERSION` (a tsmod-amxx-rcbot release, `v0.2.0`) and `RCBOT_VERSION` (a tsmod-rcbot-rs release, `v0.3.0`). The AMXX modules and RCBot talk to the port
+through its plugin API, whose version has to match: `AMXX_MODULES_VERSION` v0.4.0, `AMXX_RCBOT_VERSION` v0.2.0 and `RCBOT_VERSION` v0.3.0
 go with port v3.0.8, so build those with `--build-arg PORT_VERSION=v3.0.8` (with
 `latest`, a newer port can change the API, and Docker may also reuse an older cached download).
 

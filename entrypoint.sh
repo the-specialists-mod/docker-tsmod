@@ -15,6 +15,24 @@ if [ "$AMXX" = 1 ]; then gamedll=addons/metamod/metamod_$LIB_ARCH.so; else gamed
 sed -i "s|^gamedll_linux .*|gamedll_linux \"$gamedll\"|" "$TS/liblist.gam"
 echo "entrypoint: AMX Mod X $([ "$AMXX" = 1 ] && echo on || echo off)"
 
+# Bots: BOT_BACKEND=rcbot_amxx runs RCBot as an AMX Mod X plugin instead of tsmod_rcbot. Only one
+# of the two is installed at a time: both save what bots learn to the same tsmod/rcbot files, and
+# tsmod_rcbot saves even when it isn't the backend.
+plugins=$TS/addons/amxmodx/configs/plugins.ini
+standalone=$TS/dlls/tsmod_rcbot_$LIB_ARCH.so
+sed -i '/^rcbot_amxx\.amxx/d' "$plugins"
+if [ "$BOT_BACKEND" = rcbot_amxx ]; then
+    if [ "$AMXX" != 1 ]; then
+        echo "entrypoint: BOT_BACKEND=rcbot_amxx needs AMXX=1" >&2
+        exit 1
+    fi
+    echo rcbot_amxx.amxx >> "$plugins"
+    [ -f "$standalone" ] && mv "$standalone" "$standalone.off"
+    echo "entrypoint: RCBot as the AMX Mod X plugin rcbot_amxx (tsmod_rcbot off)"
+elif [ -f "$standalone.off" ]; then
+    mv "$standalone.off" "$standalone"
+fi
+
 # Bans (amx_ban, amx_banip, banid/addip + writeid/writeip) go to banned.cfg and listip.cfg; with a
 # volume on /data they live there and survive the container.
 for f in banned.cfg listip.cfg; do
